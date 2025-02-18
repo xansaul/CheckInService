@@ -1,23 +1,33 @@
 
-import { useState } from "react";
 import "./App.css";
-import { Button } from "./components/ui/button";
+import { AppSidebar } from "./components/app-sidebar";
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "./components/ui/sidebar";
+import { Route, Routes } from "react-router";
+import { RegisterPage } from "./pages/RegisterPage";
+import { HistoryPage } from "./pages/HistoryPage";
 
 function App() {
 
-  const [counter, setCounter] = useState(0);
 
-  const increment = () => {
-    setCounter(counter + 1);
-  }
 
   return (
-    <main className="flex flex-col justify-center items-center">
-      <p className=" font-bold text-3xl">{counter}</p>
-      <Button onClick={increment}>
-        +1
-      </Button>
-    </main>
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <header className="flex h-16 shrink-0 items-center gap-2">
+          <div className="flex items-center gap-2 px-4">
+            <SidebarTrigger className="-ml-1" />
+          </div>
+        </header>
+
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+          <Routes>
+            <Route path="/" element={<RegisterPage />} />
+            <Route path="/history" element={<HistoryPage />} />
+          </Routes>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
 
