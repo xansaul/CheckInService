@@ -2,10 +2,10 @@
 import { ColumnDef } from "@tanstack/react-table"
 
 export type StudentData = {
-    id: string;
+    id: number;
     studentCode: String;
     entryTime: Date;
-    departureTime: Date;
+    departureTime: Date | null | string;
 }
 
 const formatTime = (date: Date) => {
@@ -17,6 +17,9 @@ const formatTime = (date: Date) => {
 };
 
 const calculateDuration = (entryTime: Date, departureTime: Date) => {
+    if (departureTime === null) {
+        return "En curso";
+    }
     const diffInMinutes = Math.floor((departureTime.getTime() - entryTime.getTime()) / (1000 * 60));
     const hours = Math.floor(diffInMinutes / 60);
     const minutes = diffInMinutes % 60;
@@ -41,9 +44,12 @@ export const columns: ColumnDef<StudentData>[] = [
         header: "Codigo de estudiante",
     },
     {
-        accessorKey: "entryTime",
+        accessorKey: "entryTimeDate",
         header: "Fecha",
-        cell: ({ row }) => formatDate(row.getValue("entryTime"))
+        cell: ({ row }) => {
+            const date = row.getValue("entryTime");
+            return date instanceof Date ? formatDate(date) : "Invalid Date";
+        }
     },
     {
         accessorKey: "entryTime",
@@ -53,7 +59,7 @@ export const columns: ColumnDef<StudentData>[] = [
     {
         accessorKey: "departureTime",
         header: "Hora de salida",
-        cell: ({ row }) => formatTime(row.getValue("departureTime"))
+        cell: ({ row }) => !!row.getValue("departureTime") ? formatTime(row.getValue("departureTime")) : "No registrada"
     },
     {
         id: "duration",

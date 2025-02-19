@@ -1,170 +1,30 @@
 import { columns, StudentData } from "@/components/history-table/columns"
 import { DataTable } from "@/components/history-table/DataTable"
-const data: StudentData[] = [
-  {
-    id: "1",
-    studentCode: "21546821",
-    entryTime: new Date("2024-01-15T08:30:00"),
-    departureTime: new Date("2024-01-15T12:45:00")
-  },
-  {
-    id: "2",
-    studentCode: "21546822",
-    entryTime: new Date("2024-01-15T09:15:00"),
-    departureTime: new Date("2024-01-15T13:20:00")
-  },
-  {
-    id: "3",
-    studentCode: "21546823",
-    entryTime: new Date("2024-01-15T08:00:00"),
-    departureTime: new Date("2024-01-15T14:00:00")
-  },
-  {
-    id: "4",
-    studentCode: "217883232",
-    entryTime: new Date("2024-01-15T08:45:00"),
-    departureTime: new Date("2024-01-15T12:30:00")
-  },
-  {
-    id: "5",
-    studentCode: "217883232",
-    entryTime: new Date("2024-01-15T08:45:00"),
-    departureTime: new Date("2024-01-15T16:30:00")
-  },
-  {
-    id: "5",
-    studentCode: "217883232",
-    entryTime: new Date("2024-01-15T08:45:00"),
-    departureTime: new Date("2024-01-15T16:30:00")
-  },
-  {
-    id: "5",
-    studentCode: "217883232",
-    entryTime: new Date("2024-01-15T08:45:00"),
-    departureTime: new Date("2024-01-15T16:30:00")
-  },
-  {
-    id: "5",
-    studentCode: "217883232",
-    entryTime: new Date("2024-01-15T08:45:00"),
-    departureTime: new Date("2024-01-15T16:30:00")
-  },
-  {
-    id: "5",
-    studentCode: "217883232",
-    entryTime: new Date("2024-01-15T08:45:00"),
-    departureTime: new Date("2024-01-15T16:30:00")
-  },
-  {
-    id: "5",
-    studentCode: "217883232",
-    entryTime: new Date("2024-01-15T08:45:00"),
-    departureTime: new Date("2024-01-15T16:30:00")
-  },
-  {
-    id: "5",
-    studentCode: "217883232",
-    entryTime: new Date("2024-01-15T08:45:00"),
-    departureTime: new Date("2024-01-15T16:30:00")
-  },
-  {
-    id: "5",
-    studentCode: "217883232",
-    entryTime: new Date("2024-01-15T08:45:00"),
-    departureTime: new Date("2024-01-15T16:30:00")
-  },
-  {
-    id: "5",
-    studentCode: "217883232",
-    entryTime: new Date("2024-01-15T08:45:00"),
-    departureTime: new Date("2024-01-15T16:30:00")
-  },
-  {
-    id: "5",
-    studentCode: "217883232",
-    entryTime: new Date("2024-01-15T08:45:00"),
-    departureTime: new Date("2024-01-15T16:30:00")
-  },
-  {
-    id: "5",
-    studentCode: "217883232",
-    entryTime: new Date("2024-01-15T08:45:00"),
-    departureTime: new Date("2024-01-15T16:30:00")
-  },
-  {
-    id: "5",
-    studentCode: "217883232",
-    entryTime: new Date("2024-01-15T08:45:00"),
-    departureTime: new Date("2024-01-15T16:30:00")
-  },
-  {
-    id: "5",
-    studentCode: "217883232",
-    entryTime: new Date("2024-01-15T08:45:00"),
-    departureTime: new Date("2024-01-15T16:30:00")
-  },
-  {
-    id: "5",
-    studentCode: "217883232",
-    entryTime: new Date("2024-01-15T08:45:00"),
-    departureTime: new Date("2024-01-15T16:30:00")
-  },
-  {
-    id: "5",
-    studentCode: "217883232",
-    entryTime: new Date("2024-01-15T08:45:00"),
-    departureTime: new Date("2024-01-15T16:30:00")
-  },
-  {
-    id: "5",
-    studentCode: "217883232",
-    entryTime: new Date("2024-01-15T08:45:00"),
-    departureTime: new Date("2024-01-15T16:30:00")
-  },
-  {
-    id: "5",
-    studentCode: "217883232",
-    entryTime: new Date("2024-01-15T08:45:00"),
-    departureTime: new Date("2024-01-15T16:30:00")
-  },
-  {
-    id: "5",
-    studentCode: "217883232",
-    entryTime: new Date("2024-01-15T08:45:00"),
-    departureTime: new Date("2024-01-15T16:30:00")
-  },
-  {
-    id: "5",
-    studentCode: "217883232",
-    entryTime: new Date("2024-01-15T08:45:00"),
-    departureTime: new Date("2024-01-15T16:30:00")
-  },
-  {
-    id: "5",
-    studentCode: "217883232",
-    entryTime: new Date("2024-01-15T08:45:00"),
-    departureTime: new Date("2024-01-15T16:30:00")
-  },
-  {
-    id: "5",
-    studentCode: "217883232",
-    entryTime: new Date("2024-01-15T08:45:00"),
-    departureTime: new Date("2024-01-15T16:30:00")
-  },
-  {
-    id: "5",
-    studentCode: "217883232",
-    entryTime: new Date("2024-01-15T08:45:00"),
-    departureTime: new Date("2024-01-15T16:30:00")
-  },
-  {
-    id: "5",
-    studentCode: "217883232",
-    entryTime: new Date("2024-01-15T08:45:00"),
-    departureTime: new Date("2024-01-15T16:30:00")
-  },
-]
+import { useEffect, useState } from "react"
+import Database from '@tauri-apps/plugin-sql';
+
 export const HistoryPage = () => {
+  const [data, setData] = useState<StudentData[]>([]);
+  useEffect(()=>{
+    const getData = async () => {
+      const db = await Database.load('sqlite:registrohoras.db');
+      const result : { id: number;
+        student_code: String;
+        check_in: Date;
+        check_out: Date  }[] = await db.select('SELECT * FROM attendance_records');
+      console.log(result)
+      setData(result.map((result) => {
+        return  {
+          id: result.id,
+          studentCode:result.student_code,
+          entryTime: new Date(result.check_in),
+          departureTime:  result.check_out ? new Date(result.check_out) : null,
+        }
+      }))
+
+    }
+    getData();
+  },[]);
   return (
     <div>
       <h1 className="text-3xl font-bold mb-10">Historial</h1>
