@@ -12,19 +12,20 @@ export const HistoryPage = () => {
         student_code: String;
         check_in: Date;
         check_out: Date  }[] = await db.select('SELECT * FROM attendance_records');
-      console.log(result)
       setData(result.map((result) => {
+        
         return  {
           id: result.id,
           studentCode:result.student_code,
           entryTime: new Date(result.check_in),
-          departureTime:  result.check_out ? new Date(result.check_out) : null,
+          departureTime: result.check_out ? new Date(result.check_out) : null,
         }
       }))
 
     }
     getData();
   },[]);
+
   return (
     <div>
       <h1 className="text-3xl font-bold mb-10">Historial</h1>

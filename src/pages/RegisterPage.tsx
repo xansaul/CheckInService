@@ -12,50 +12,43 @@ export const RegisterPage = () => {
       alert('Por favor ingrese un código de estudiante');
       return;
     }
-
+    
     try {
       const db = await Database.load('sqlite:registrohoras.db');
-      
-      
-      const today = new Date().toISOString().split('T')[0];
+      // if(true){
+      //   await db.execute("delete from attendance_records")
+      //   return;
+      // }
+      const currentDate = new Date();
+      const currentISOTime = currentDate.toISOString();
+
       const existingRecord = await db.select(
         `SELECT * FROM attendance_records 
          WHERE student_code = ? 
          AND DATE(check_in) = DATE(?) 
          AND check_out IS NULL`,
-        [studentCode, today]
+        [studentCode, currentISOTime]
       );
 
-      const currentTime = new Date();
-      const isoTime = currentTime.toISOString();
-
-      if ((existingRecord  as any).length === 0) {
-        // Create new entry
+      if ((existingRecord as any).length === 0) {
         await db.execute(
           'INSERT INTO attendance_records (student_code, check_in) VALUES (?, ?)',
-          [studentCode, isoTime]
+          [studentCode, currentISOTime]
         );
         alert('Entrada registrada exitosamente');
       } else {
-        const record = (existingRecord  as any)[0];
+        const record = (existingRecord as any)[0];
         const checkInTime = new Date(record.check_in);
-        
-        // Calculate total hours with 2 decimal precision
-        const totalHours = Number(
-          ((currentTime.getTime() - checkInTime.getTime()) / (1000 * 60 * 60)).toFixed(2)
-        );
-
-        if (totalHours < 0) {
-          throw new Error('Error en el cálculo de horas');
-        }
+        const checkOutTime = new Date();
+        const totalHours = (checkOutTime.getTime() - checkInTime.getTime()) / (1000 * 60 * 60);
 
         await db.execute(
           `UPDATE attendance_records 
            SET check_out = ?, total_hours = ? 
            WHERE id = ?`,
-          [isoTime, totalHours, record.id]
+          [currentISOTime, totalHours, record.id]
         );
-        alert(`Salida registrada exitosamente. Total horas: ${totalHours}`);
+        alert(`Salida registrada exitosamente. Total horas: ${totalHours.toFixed(2)}`);
       }
 
       setStudentCode(''); // Clear input after successful operation

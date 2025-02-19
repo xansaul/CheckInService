@@ -1,5 +1,6 @@
 
 import { ColumnDef } from "@tanstack/react-table"
+import { dateBetween } from "./DataTable";
 
 export type StudentData = {
     id: number;
@@ -9,7 +10,7 @@ export type StudentData = {
 }
 
 const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', {
+    return date.toLocaleTimeString('es-Es', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: true
@@ -54,7 +55,8 @@ export const columns: ColumnDef<StudentData>[] = [
     {
         accessorKey: "entryTime",
         header: "Hora de entrada",
-        cell: ({ row }) => formatTime(row.getValue("entryTime"))
+        cell: ({ row }) => formatTime(row.getValue("entryTime")),
+        filterFn: dateBetween
     },
     {
         accessorKey: "departureTime",

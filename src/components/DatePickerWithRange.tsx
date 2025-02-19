@@ -26,10 +26,6 @@ export function DatePickerWithRange({
     to: addDays(new Date(), 7),
   })
 
-  React.useEffect(() => {
-    onDateRangeChange?.(date)
-  }, [date, onDateRangeChange])
-
   return (
     <div className={cn("grid gap-2", className)}>
       <Popover>
@@ -63,7 +59,10 @@ export function DatePickerWithRange({
             mode="range"
             defaultMonth={date?.from}
             selected={date}
-            onSelect={setDate}
+            onSelect={(dateRange: DateRange | undefined)=>{
+              setDate(dateRange)
+              onDateRangeChange && onDateRangeChange(dateRange)
+            }}
             numberOfMonths={2}
           />
         </PopoverContent>

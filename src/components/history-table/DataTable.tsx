@@ -8,8 +8,8 @@ import {
   getFilteredRowModel,
   useReactTable,
   getPaginationRowModel,
-  PaginationState
-} from "@tanstack/react-table"
+  PaginationState,
+} from "@tanstack/react-table";
 
 import {
   Table,
@@ -18,39 +18,38 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Input } from "../ui/input"
-import { useMemo, useState } from "react"
-import { Button } from "../ui/button"
-import { DatePickerWithRange } from "../DatePickerWithRange"
-import { DateRange } from "react-day-picker"
+} from "@/components/ui/table";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import { DatePickerWithRange } from "../DatePickerWithRange";
+import { useState } from "react";
+import { DateRange } from "react-day-picker";
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+}
+
+export const dateBetween = (row: any, columnId: string, value: DateRange) => {
+  if (!value?.from || !value?.to) return true;
+  const cellValue = row.getValue(columnId) as Date;
+  const from = new Date(value.from);
+  const to = new Date(value.to);
+  to.setHours(23, 59, 59, 999);
+  return cellValue >= from && cellValue <= to;
 }
 
 export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([])
+  const [sorting, setSorting] = useState<SortingState>([]);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 15,
-  })
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [dateRange, setDateRange] = useState<DateRange | undefined>()
-
-  const filteredData = useMemo(() => {
-    if (!dateRange?.from || !dateRange?.to) return data
-    return data.filter((item: any) => {
-      const itemDate = new Date(item.entryTime)
-      const endDate = new Date(dateRange.to!)
-      endDate.setHours(23, 59, 59, 999)
-      return itemDate >= dateRange.from! && itemDate <= endDate
-    })
-  }, [data, dateRange])
+  });
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  
 
   const table = useReactTable({
-    data: filteredData,
+    data: data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
@@ -59,25 +58,33 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
     onColumnFiltersChange: setColumnFilters,
     getPaginationRowModel: getPaginationRowModel(),
     onPaginationChange: setPagination,
+    filterFns: {
+      dateBetween
+    },
     state: {
       sorting,
       columnFilters,
       pagination,
     },
-  })
+  });
 
   return (
     <>
       <div className="flex justify-between">
         <Input
-          placeholder="Filtrar por codigo"
+          placeholder="Filtrar por código"
           value={(table.getColumn("studentCode")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("studentCode")?.setFilterValue(event.target.value)
           }
           className="max-w-sm mb-4"
         />
-        <DatePickerWithRange onDateRangeChange={setDateRange} />
+        <DatePickerWithRange
+          onDateRangeChange={(range) => {
+            
+            table.getColumn("entryTime")?.setFilterValue(range);
+          }}
+        />
       </div>
       <div className="rounded-md border">
         <Table>
@@ -90,11 +97,11 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -124,13 +131,19 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
         </Table>
       </div>
       <div className="my-2 flex gap-3 justify-end w-full">
-        <Button onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+        <Button
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
           Anterior
         </Button>
-        <Button onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+        <Button
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+        >
           Siguiente
         </Button>
       </div>
     </>
-  )
+  );
 }
