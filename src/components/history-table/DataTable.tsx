@@ -20,28 +20,37 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Input } from "../ui/input"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { Button } from "../ui/button"
+import { DatePickerWithRange } from "../DatePickerWithRange"
+import { DateRange } from "react-day-picker"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
 }
 
-export function DataTable<TData, TValue>({
-  columns,
-  data,
-}: DataTableProps<TData, TValue>) {
-
-  const [sorting, setSorting] = useState<SortingState>([]);
+export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
+  const [sorting, setSorting] = useState<SortingState>([])
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 15, 
-  });
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+    pageSize: 15,
+  })
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [dateRange, setDateRange] = useState<DateRange | undefined>()
+
+  const filteredData = useMemo(() => {
+    if (!dateRange?.from || !dateRange?.to) return data
+    return data.filter((item: any) => {
+      const itemDate = new Date(item.entryTime)
+      const endDate = new Date(dateRange.to!)
+      endDate.setHours(23, 59, 59, 999)
+      return itemDate >= dateRange.from! && itemDate <= endDate
+    })
+  }, [data, dateRange])
 
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
@@ -59,14 +68,17 @@ export function DataTable<TData, TValue>({
 
   return (
     <>
-      <Input
-        placeholder="Filtrar por codigo"
-        value={(table.getColumn("studentCode")?.getFilterValue() as string) ?? ""}
-        onChange={(event) =>
-          table.getColumn("studentCode")?.setFilterValue(event.target.value)
-        }
-        className="max-w-sm mb-4"
-      />
+      <div className="flex justify-between">
+        <Input
+          placeholder="Filtrar por codigo"
+          value={(table.getColumn("studentCode")?.getFilterValue() as string) ?? ""}
+          onChange={(event) =>
+            table.getColumn("studentCode")?.setFilterValue(event.target.value)
+          }
+          className="max-w-sm mb-4"
+        />
+        <DatePickerWithRange onDateRangeChange={setDateRange} />
+      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -111,14 +123,14 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-        <div className="my-2 flex gap-3 justify-end w-full">
-          <Button onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
-            Anterior
-          </Button>
-          <Button onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-            Siguiente
-          </Button>
-        </div>
+      <div className="my-2 flex gap-3 justify-end w-full">
+        <Button onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+          Anterior
+        </Button>
+        <Button onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+          Siguiente
+        </Button>
+      </div>
     </>
   )
 }
