@@ -3,7 +3,6 @@ use tauri_plugin_sql::{Migration, MigrationKind};
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let migrations = vec![
-
         Migration {
             version: 1,
             description: "create_attendance_records",

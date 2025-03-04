@@ -25,6 +25,7 @@ import { DatePickerWithRange } from "../DatePickerWithRange";
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { AlertDialogHeader, AlertDialogFooter, AlertDialog, AlertDialogContent, AlertDialogTitle, AlertDialogDescription, AlertDialogCancel } from "../ui/alert-dialog";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -101,9 +102,9 @@ export function DataTable<TData, TValue>({ columns, data, onDelete }: DataTableP
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   );
                 })}
@@ -116,7 +117,7 @@ export function DataTable<TData, TValue>({ columns, data, onDelete }: DataTableP
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  onDoubleClick={()=>{
+                  onDoubleClick={() => {
                     setSelectedRow(row.original);
                     setIsModalOpen(true);
                   }}
@@ -165,21 +166,33 @@ export function DataTable<TData, TValue>({ columns, data, onDelete }: DataTableP
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel onClick={()=>setIsModalOpen(false)}>Cancelar</AlertDialogCancel>
-              
-                <Button variant="destructive" onClick={async ()=>{
+              <AlertDialogCancel onClick={() => setIsModalOpen(false)}>Cancelar</AlertDialogCancel>
+
+              <Button variant="destructive" onClick={async () => {
                 if (selectedRow && selectedRow.id) {
                   await onDelete(selectedRow.id);
                   setIsModalOpen(false);
                 }
               }}>
-                  Eliminar
-                </Button>
-              
+                Eliminar
+              </Button>
+
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
       </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Conteo de horas</CardTitle>
+          <CardDescription>Selecciona columnas para contar las horas totales.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-2 items-center">
+            <p>Total de horas: </p>
+            <span className="font-bold text-xl">0</span>
+          </div>
+        </CardContent>
+      </Card>
     </>
   );
 }
