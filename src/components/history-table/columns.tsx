@@ -2,6 +2,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { dateBetween } from "./DataTable";
 import { Checkbox } from "../ui/checkbox";
+import { calculateDuration } from "@/utils/calculateDuration";
 
 export type StudentData = {
     id: number;
@@ -16,20 +17,6 @@ const formatTime = (date: Date) => {
         minute: '2-digit',
         hour12: true
     });
-};
-
-const calculateDuration = (entryTime: Date, departureTime: Date) => {
-    if (departureTime === null) {
-        return "En curso";
-    }
-    const diffInMinutes = Math.floor((departureTime.getTime() - entryTime.getTime()) / (1000 * 60));
-    const hours = Math.floor(diffInMinutes / 60);
-    const minutes = diffInMinutes % 60;
-    
-    if (hours > 0) {
-        return `${hours} ${hours === 1 ? 'hora' : 'horas'}${minutes > 0 ? ` ${minutes} min` : ''}`;
-    }
-    return `${minutes} min`;
 };
 
 const formatDate = (date: Date) => {

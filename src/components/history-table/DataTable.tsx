@@ -24,8 +24,24 @@ import { Button } from "../ui/button";
 import { DatePickerWithRange } from "../DatePickerWithRange";
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
-import { AlertDialogHeader, AlertDialogFooter, AlertDialog, AlertDialogContent, AlertDialogTitle, AlertDialogDescription, AlertDialogCancel } from "../ui/alert-dialog";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
+import {
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+} from "../ui/alert-dialog";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
+import { ExcelExport } from "../ExcelExport";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -40,11 +56,13 @@ export const dateBetween = (row: any, columnId: string, value: DateRange) => {
   const to = new Date(value.to);
   to.setHours(23, 59, 59, 999);
   return cellValue >= from && cellValue <= to;
-}
+};
 
-
-
-export function DataTable<TData, TValue>({ columns, data, onDelete }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({
+  columns,
+  data,
+  onDelete,
+}: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -53,6 +71,31 @@ export function DataTable<TData, TValue>({ columns, data, onDelete }: DataTableP
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [selectedRow, setSelectedRow] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const calculateTotalHours = () => {
+    const selectedRows = table.getFilteredSelectedRowModel().rows;
+    let totalMinutes = 0;
+
+    selectedRows.forEach((row) => {
+      const entryTime = (row.original as any).entryTime;
+      const departureTime = (row.original as any).departureTime;
+      if(departureTime === "No registrada") {
+        return
+      }
+
+      if (entryTime && departureTime) {
+        totalMinutes += Math.floor(
+          (departureTime.getTime() - entryTime.getTime()) / (1000 * 60)
+        );
+      }
+    });
+
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return `${hours} ${hours === 1 ? "hora" : "horas"}${
+      minutes > 0 ? ` ${minutes} min` : ""
+    }`;
+  };
 
   const table = useReactTable({
     data: data,
@@ -65,7 +108,7 @@ export function DataTable<TData, TValue>({ columns, data, onDelete }: DataTableP
     getPaginationRowModel: getPaginationRowModel(),
     onPaginationChange: setPagination,
     filterFns: {
-      dateBetween
+      dateBetween,
     },
     state: {
       sorting,
@@ -79,7 +122,9 @@ export function DataTable<TData, TValue>({ columns, data, onDelete }: DataTableP
       <div className="flex justify-between">
         <Input
           placeholder="Filtrar por código"
-          value={(table.getColumn("studentCode")?.getFilterValue() as string) ?? ""}
+          value={
+            (table.getColumn("studentCode")?.getFilterValue() as string) ?? ""
+          }
           onChange={(event) =>
             table.getColumn("studentCode")?.setFilterValue(event.target.value)
           }
@@ -102,9 +147,9 @@ export function DataTable<TData, TValue>({ columns, data, onDelete }: DataTableP
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                     </TableHead>
                   );
                 })}
@@ -119,19 +164,26 @@ export function DataTable<TData, TValue>({ columns, data, onDelete }: DataTableP
                   data-state={row.getIsSelected() && "selected"}
                   onDoubleClick={() => {
                     setSelectedRow(row.original);
+
                     setIsModalOpen(true);
                   }}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
                   No results.
                 </TableCell>
               </TableRow>
@@ -159,24 +211,30 @@ export function DataTable<TData, TValue>({ columns, data, onDelete }: DataTableP
         <AlertDialog open={isModalOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>¿Estás seguro de eliminar este registro?</AlertDialogTitle>
+              <AlertDialogTitle>
+                ¿Estás seguro de eliminar este registro?
+              </AlertDialogTitle>
               <AlertDialogDescription>
-                Esta acción no se puede deshacer. Se eliminará permanentemente el registro
-                de la base de datos.
+                Esta acción no se puede deshacer. Se eliminará permanentemente
+                el registro de la base de datos.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel onClick={() => setIsModalOpen(false)}>Cancelar</AlertDialogCancel>
+              <AlertDialogCancel onClick={() => setIsModalOpen(false)}>
+                Cancelar
+              </AlertDialogCancel>
 
-              <Button variant="destructive" onClick={async () => {
-                if (selectedRow && selectedRow.id) {
-                  await onDelete(selectedRow.id);
-                  setIsModalOpen(false);
-                }
-              }}>
+              <Button
+                variant="destructive"
+                onClick={async () => {
+                  if (selectedRow && selectedRow.id) {
+                    await onDelete(selectedRow.id);
+                    setIsModalOpen(false);
+                  }
+                }}
+              >
                 Eliminar
               </Button>
-
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
@@ -184,14 +242,25 @@ export function DataTable<TData, TValue>({ columns, data, onDelete }: DataTableP
       <Card>
         <CardHeader>
           <CardTitle>Conteo de horas</CardTitle>
-          <CardDescription>Selecciona columnas para contar las horas totales.</CardDescription>
+          <CardDescription>
+            Selecciona columnas para contar las horas totales.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex gap-2 items-center">
             <p>Total de horas: </p>
-            <span className="font-bold text-xl">0</span>
+            <span className="font-bold text-xl">{calculateTotalHours()}</span>
           </div>
         </CardContent>
+        <CardFooter>
+          <ExcelExport
+            data={table
+              .getFilteredSelectedRowModel()
+              .rows.map((row) => row.original)}
+            fileName="DatosAlumno"
+            totalHours={calculateTotalHours()}
+          />
+        </CardFooter>
       </Card>
     </>
   );
