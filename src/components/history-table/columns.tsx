@@ -1,6 +1,7 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { dateBetween } from "./DataTable";
+import { Checkbox } from "../ui/checkbox";
 
 export type StudentData = {
     id: number;
@@ -40,6 +41,31 @@ const formatDate = (date: Date) => {
 };
 
 export const columns: ColumnDef<StudentData>[] = [
+    {
+        id: "select",
+        header: ({ table }) => (
+          <Checkbox
+            checked={
+              table.getIsAllPageRowsSelected() ||
+              (table.getIsSomePageRowsSelected() && "indeterminate")
+            }
+            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+            aria-label="Select all"
+          />
+        ),
+        cell: ({ row }) => (
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => {
+                row.toggleSelected(!!value)
+                console.log(row.original)
+            }}
+            aria-label="Select row"
+          />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+      },
     {
         accessorKey: "studentCode",
         header: "Codigo de estudiante",

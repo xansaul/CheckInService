@@ -24,10 +24,12 @@ import { Button } from "../ui/button";
 import { DatePickerWithRange } from "../DatePickerWithRange";
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
+import { AlertDialogHeader, AlertDialogFooter, AlertDialog, AlertDialogContent, AlertDialogTitle, AlertDialogDescription, AlertDialogCancel } from "../ui/alert-dialog";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  onDelete: (id: number) => Promise<void>;
 }
 
 export const dateBetween = (row: any, columnId: string, value: DateRange) => {
@@ -39,14 +41,17 @@ export const dateBetween = (row: any, columnId: string, value: DateRange) => {
   return cellValue >= from && cellValue <= to;
 }
 
-export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
+
+
+export function DataTable<TData, TValue>({ columns, data, onDelete }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 15,
   });
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  
+  const [selectedRow, setSelectedRow] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const table = useReactTable({
     data: data,
@@ -81,7 +86,6 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
         />
         <DatePickerWithRange
           onDateRangeChange={(range) => {
-            
             table.getColumn("entryTime")?.setFilterValue(range);
           }}
         />
@@ -112,6 +116,10 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  onDoubleClick={()=>{
+                    setSelectedRow(row.original);
+                    setIsModalOpen(true);
+                  }}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -130,7 +138,11 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
           </TableBody>
         </Table>
       </div>
-      <div className="my-2 flex gap-3 justify-end w-full">
+      <div className="my-2 flex gap-3 justify-between w-full">
+        <div className="flex-1 text-sm text-muted-foreground">
+          {table.getFilteredSelectedRowModel().rows.length} de{" "}
+          {table.getFilteredRowModel().rows.length} Filas Seleccionadas
+        </div>
         <Button
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
@@ -143,6 +155,30 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
         >
           Siguiente
         </Button>
+        <AlertDialog open={isModalOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>¿Estás seguro de eliminar este registro?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Esta acción no se puede deshacer. Se eliminará permanentemente el registro
+                de la base de datos.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={()=>setIsModalOpen(false)}>Cancelar</AlertDialogCancel>
+              
+                <Button variant="destructive" onClick={async ()=>{
+                if (selectedRow && selectedRow.id) {
+                  await onDelete(selectedRow.id);
+                  setIsModalOpen(false);
+                }
+              }}>
+                  Eliminar
+                </Button>
+              
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </>
   );

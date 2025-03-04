@@ -3,13 +3,14 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import Database from '@tauri-apps/plugin-sql';
+import { toast } from "sonner";
 
 export const RegisterPage = () => {
   const [studentCode, setStudentCode] = useState('');
 
   const handleSubmit = async () => {
     if (!studentCode) {
-      alert('Por favor ingrese un código de estudiante');
+      toast.error('Por favor ingrese un código de estudiante')
       return;
     }
     
@@ -35,7 +36,7 @@ export const RegisterPage = () => {
           'INSERT INTO attendance_records (student_code, check_in) VALUES (?, ?)',
           [studentCode, currentISOTime]
         );
-        alert('Entrada registrada exitosamente');
+        toast.success('Entrada registrada exitosamente');
       } else {
         const record = (existingRecord as any)[0];
         const checkInTime = new Date(record.check_in);
@@ -48,13 +49,14 @@ export const RegisterPage = () => {
            WHERE id = ?`,
           [currentISOTime, totalHours, record.id]
         );
-        alert(`Salida registrada exitosamente. Total horas: ${totalHours.toFixed(2)}`);
+        toast.success(`Salida registrada exitosamente. Total horas: ${totalHours.toFixed(2)}`)
+ 
       }
 
-      setStudentCode(''); // Clear input after successful operation
+      setStudentCode(''); 
     } catch (error) {
       console.error('Error:', error);
-      alert('Error al registrar. Por favor intente nuevamente.');
+      toast.error('Error al registrar. Por favor intente nuevamente.');
     }
   };
 
