@@ -5,7 +5,7 @@ import { calculateDuration } from '@/utils/calculateDuration';
 
 export const ExcelExport = ({ data, fileName, totalHours }: { data: any, fileName: string, totalHours: string }) => {
   const exportToExcel = () => {
-
+    
     const rowsWithDuration = data.map((row: any) => {
       const entryTime = row.entryTime;
       const departureTime = row.departureTime;

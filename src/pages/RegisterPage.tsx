@@ -16,6 +16,18 @@ export const RegisterPage = () => {
     
     try {
       const db = await Database.load('sqlite:registrohoras.db');
+      
+      // Create table if it doesn't exist
+      await db.execute(`
+        CREATE TABLE IF NOT EXISTS attendance_records (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          student_code TEXT NOT NULL,
+          check_in TEXT NOT NULL,
+          check_out TEXT,
+          total_hours REAL
+        )
+      `);
+      
       // if(true){
       //   await db.execute("delete from attendance_records")
       //   return;
